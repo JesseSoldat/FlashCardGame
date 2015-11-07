@@ -17,11 +17,15 @@ import SelectDeck from './views/select_deck';
 let Router = Backbone.Router.extend({
 
   routes: {
-    ""                       : "redirectToWelecome",
-    "welcome"                : "welcome",
-    "login"                  : "signIn",
-    "register"               : "createAccount",
-    "user/:username"         : "selectDeck",
+    ""                                : "redirectToWelecome",
+    "welcome"                         : "welcome",
+    "login"                           : "signIn",
+    "register"                        : "createAccount",
+    "user/:username"                  : "selectDeck",
+    "user/:username/decks"            : "addDeck",
+    "user/:username/decks/:id/edit"   : "editDeck",
+    "user/:username/play/:id"         : "playDeck",
+
   },
 
 
@@ -166,7 +170,7 @@ let Router = Backbone.Router.extend({
    selectDeck(){
     let userData = Cookies.getJSON('user');
     // let test = Cookies.get('user');
-    console.log(userData);
+    // console.log(userData);
 
     let request = $.ajax({
       url: 'https://morning-temple-4972.herokuapp.com/decks',
@@ -181,7 +185,11 @@ let Router = Backbone.Router.extend({
       // console.log(data);
     //-----------------------
     this.render(<SelectDeck
-      decks={data}/>
+      decks={data}
+      onAdd={() => this.goto(`user/${userData.username}/decks`)}
+      onPlay={(id) => this.goto(`user/${userData.username}/play/${id}`)}
+      onEdit={(id) => this.goto(`user/${userData.username}/decks/${id}/edit`)}/>
+      
       );
     //-----------------------
   
@@ -192,10 +200,18 @@ let Router = Backbone.Router.extend({
 
 
   }, //selectDeck
-//---------------------------------------------------------------
-
-
-
+//------------------------------------------------------------
+  addDeck(){
+    console.log('addDeckPage');
+  },
+//------------------------------------------------------------ 
+  editDeck(username, id) {
+    console.log(id);
+  },
+//------------------------------------------------------------
+  playDeck(username, id) {
+    console.log(id);
+  },
 
 
 

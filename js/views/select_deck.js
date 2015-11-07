@@ -5,19 +5,22 @@ import AdminComponent from './admin_component';
 export default React.createClass({
 
   logOut(){
-    console.log('logOut');
+    // console.log('logOut');
   },
 
   addDeck(){
-    console.log('addDeck');
+    // console.log('addDeck');
+    this.props.onAdd();
   },
 
-  playDeck(){
-    console.log('playDeck');
+  playDeck(id){
+    // console.log('playDeck');
+    this.props.onPlay(id);
 
   },
-  editDeck(){
-   console.log('editDeck');
+  editDeck(id){
+   // console.log('editDeck');
+   this.props.onEdit(id);
   },
 //-------------------------------------------------------
   formatDecks(deck){

@@ -73,7 +73,11 @@ var Router = _backbone2['default'].Router.extend({
     "welcome": "welcome",
     "login": "signIn",
     "register": "createAccount",
-    "user/:username": "selectDeck"
+    "user/:username": "selectDeck",
+    "user/:username/decks": "addDeck",
+    "user/:username/decks/:id/edit": "editDeck",
+    "user/:username/play/:id": "playDeck"
+
   },
 
   //initial setup
@@ -235,7 +239,7 @@ var Router = _backbone2['default'].Router.extend({
 
     var userData = _jsCookie2['default'].getJSON('user');
     // let test = Cookies.get('user');
-    console.log(userData);
+    // console.log(userData);
 
     var request = _jquery2['default'].ajax({
       url: 'https://morning-temple-4972.herokuapp.com/decks',
@@ -250,15 +254,35 @@ var Router = _backbone2['default'].Router.extend({
       // console.log(data);
       //-----------------------
       _this6.render(_react2['default'].createElement(_viewsSelect_deck2['default'], {
-        decks: data }));
+        decks: data,
+        onAdd: function () {
+          return _this6.goto('user/' + userData.username + '/decks');
+        },
+        onPlay: function (id) {
+          return _this6.goto('user/' + userData.username + '/play/' + id);
+        },
+        onEdit: function (id) {
+          return _this6.goto('user/' + userData.username + '/decks/' + id + '/edit');
+        } }));
       //-----------------------
     }).fail(function () {
       (0, _jquery2['default'])('.app').html('Unable to load Decks...');
     });
-  } }); //router
-//selectDeck
-//---------------------------------------------------------------
+  }, //selectDeck
+  //------------------------------------------------------------
+  addDeck: function addDeck() {
+    console.log('addDeckPage');
+  },
+  //------------------------------------------------------------
+  editDeck: function editDeck(username, id) {
+    console.log(id);
+  },
+  //------------------------------------------------------------
+  playDeck: function playDeck(username, id) {
+    console.log(id);
+  }
 
+}); //router
 exports['default'] = Router;
 module.exports = exports['default'];
 
@@ -538,18 +562,21 @@ exports['default'] = _react2['default'].createClass({
   displayName: 'select_deck',
 
   logOut: function logOut() {
-    console.log('logOut');
+    // console.log('logOut');
   },
 
   addDeck: function addDeck() {
-    console.log('addDeck');
+    // console.log('addDeck');
+    this.props.onAdd();
   },
 
-  playDeck: function playDeck() {
-    console.log('playDeck');
+  playDeck: function playDeck(id) {
+    // console.log('playDeck');
+    this.props.onPlay(id);
   },
-  editDeck: function editDeck() {
-    console.log('editDeck');
+  editDeck: function editDeck(id) {
+    // console.log('editDeck');
+    this.props.onEdit(id);
   },
   //-------------------------------------------------------
   formatDecks: function formatDecks(deck) {
