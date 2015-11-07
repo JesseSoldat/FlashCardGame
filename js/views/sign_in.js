@@ -9,6 +9,8 @@ export default React.createClass({
       email: "",
       username: "",
       password: "", 
+      card_question: "",
+      card_answer: "",
     };
   },
 

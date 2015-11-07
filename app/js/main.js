@@ -335,15 +335,80 @@ var Router = _backbone2['default'].Router.extend({
   }, //newDeck
   //------------------------------------------------------------
   playDeck: function playDeck(username, id) {
+    var _this9 = this;
+
     // console.log(id);
-    _react2['default'].createElement('playDeck', null);
-  },
+    var user = _jsCookie2['default'].getJSON('user');
+
+    var request = _jquery2['default'].ajax({
+      url: 'https:/morning-temple-4972.herokuapp.com/decks/' + id,
+      method: 'GET',
+      headers: {
+        auth_token: user.auth_token
+      }, //headers
+      data: {
+        title: user.title
+      }
+    }); //ajax
+    (0, _jquery2['default'])('.app').html('loading.....');
+
+    request.then(function (data) {
+
+      console.log(data);
+
+      _this9.render(_react2['default'].createElement(_viewsPlay_deck2['default'], {
+        cards: data }));
+    }); //.then
+  }, //playDeck
   //------------------------------------------------------------
   editDeck: function editDeck(username, id) {
-    // console.log(id);
-    _react2['default'].createElement(_viewsEdit_deck2['default'], null);
-  }
-}); //router
+    var _this10 = this;
+
+    var user = _jsCookie2['default'].getJSON('user');
+    console.log(id);
+    this.render(_react2['default'].createElement(_viewsEdit_deck2['default'], {
+      deckId: id,
+      onLogOut: function () {
+        return _this10.removeCookies();
+      },
+      onCancelClick: function () {
+        return _this10.goto('user/' + user.username);
+      },
+      onSubmitClick: function (question, answer, id) {
+        return _this10.saveCard(question, answer, id);
+      } }));
+  },
+  saveCard: function saveCard(question, answer, id) {
+    var _this11 = this;
+
+    var user = _jsCookie2['default'].getJSON('user');
+    console.log(question, answer, id);
+    var request = _jquery2['default'].ajax({
+      url: 'https:/morning-temple-4972.herokuapp.com/decks/' + id + '/cards',
+      method: 'POST',
+      headers: {
+        auth_token: user.auth_token
+      }, //headers
+      data: {
+        question: question,
+        answer: answer
+      }
+    }); //ajax
+    (0, _jquery2['default'])('.app').html('loading.....');
+    request.then(function (data) {
+      _jquery2['default'].ajaxSetup({
+        headers: {
+          id: data.id,
+          question: data.question,
+          answer: data.answer
+        } //headers
+      }); //ajaxSetup
+      _this11.goto('user/' + user.username);
+    }).fail(function () {
+      (0, _jquery2['default'])('.app').html('Can not save card......');
+    });
+  } }); //router
+//saveCard
 //------------------------------------------------------------
 
 exports['default'] = Router;
@@ -626,11 +691,60 @@ var _admin_component2 = _interopRequireDefault(_admin_component);
 exports['default'] = _react2['default'].createClass({
   displayName: 'edit_deck',
 
+  logOutHandler: function logOutHandler() {
+    // console.log('logOut');
+    this.props.onLogOut();
+  },
+  //--------------------------------------------------
+  updateQuestion: function updateQuestion(event) {
+    var newQuestion = event.currentTarget.value;
+
+    this.setState({
+      card_question: newQuestion
+    });
+  },
+  updateAnswer: function updateAnswer(event) {
+    var newAnswer = event.currentTarget.value;
+
+    this.setState({
+      card_answer: newAnswer
+    });
+  },
+  //--------------------------------------------------
+  cancel: function cancel() {
+    this.props.onCancelClick();
+  },
+  submit: function submit() {
+    this.props.onSubmitClick(this.state.card_question, this.state.card_answer, this.props.deckId);
+  },
+
   render: function render() {
     return _react2['default'].createElement(
       'div',
       null,
-      _react2['default'].createElement(_admin_component2['default'], null)
+      _react2['default'].createElement(_admin_component2['default'], { logOutHandler: this.logOutHandler }),
+      _react2['default'].createElement(
+        'h2',
+        null,
+        'Edit Cards'
+      ),
+      _react2['default'].createElement(
+        'h3',
+        null,
+        this.props.deckId
+      ),
+      _react2['default'].createElement('input', { onChange: this.updateQuestion }),
+      _react2['default'].createElement('input', { onChange: this.updateAnswer }),
+      _react2['default'].createElement(
+        'button',
+        { onClick: this.submit },
+        'Submit'
+      ),
+      _react2['default'].createElement(
+        'button',
+        { onClick: this.cancel },
+        'Cancel'
+      )
     );
   }
 
@@ -719,7 +833,25 @@ exports['default'] = _react2['default'].createClass({
   displayName: 'play_deck',
 
   render: function render() {
-    return _react2['default'].createElement('div', null);
+    return _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'h1',
+        null,
+        'Play this deck'
+      ),
+      _react2['default'].createElement(
+        'h1',
+        null,
+        this.props.cards.title
+      ),
+      _react2['default'].createElement(
+        'h1',
+        null,
+        this.props.cards.id
+      )
+    );
   }
 
 });
@@ -864,7 +996,9 @@ exports["default"] = _react2["default"].createClass({
       lastname: "",
       email: "",
       username: "",
-      password: ""
+      password: "",
+      card_question: "",
+      card_answer: ""
     };
   },
 
