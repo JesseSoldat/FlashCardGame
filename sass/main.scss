@@ -1,6 +1,17 @@
 // Put any @imports here
+@import "bourbon";
+@import "neat";
+@import "font-awesome";
+
 // See Readme for a list of supported ones
 
 body {
   background: #e2ebf3;
+}
+.deck {
+  width: 200px;
+  height: 200px;
+  background-color: pink;
+  float: left;
+  margin: 3%;
 }
