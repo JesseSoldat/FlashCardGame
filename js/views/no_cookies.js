@@ -3,11 +3,14 @@ import React from 'react';
 export default React.createClass({
 
   signIn(){
-    console.log('signIn');
+    // console.log('signIn');
+    this.props.onSignInClick();
   },
 
   createAccount(){
-    console.log('createAccount');
+    // console.log('createAccount');
+    this.props.onCreateAccountClick();
+
     
   },
 
@@ -16,7 +19,7 @@ export default React.createClass({
     return (
       <div>
         <div className="header">
-         <h1>test</h1>
+         <h1>Welcome</h1>
         </div>
         <div className="welcome">
           <form>

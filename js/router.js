@@ -3,10 +3,13 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import _ from 'underscore';
 import Cookies from 'cookies-js';
+import $ from 'jquery';
 //---------------------------------
 //Views
 //---------------------------------
-import NoCookies from './views/no_cookies'
+import NoCookies from './views/no_cookies';
+import SignIn from './views/sign_in';
+import CreateAccount from './views/create_account';
 
 //Router for page views
 //-----------------------------------
@@ -15,12 +18,12 @@ let Router = Backbone.Router.extend({
   routes: {
     ""           : "redirectToWelecome",
     "welcome"    : "welcome",
-    "login"      : "login",
-    "register"   : "register",
+    "login"      : "signIn",
+    "register"   : "createAccount",
   },
 
 
-//initial setup
+//initial setup 
 //-----------------------------------
 
   initialize(appElement) {
@@ -45,7 +48,7 @@ let Router = Backbone.Router.extend({
       trigger: true
     });
   },
-
+//---------------------------------------------------------------
   redirectToWelecome() {
     // console.log('redirectToWelcome');
     this.navigate('welcome', {
@@ -53,28 +56,76 @@ let Router = Backbone.Router.extend({
       trigger: true
     });
   }, //redirectToWelcome
-
+//---------------------------------------------------------------
   welcome() {
     // console.log("welcome");
-    this.render(<NoCookies/>)
+    this.render(
+      <NoCookies
+      onSignInClick={() => this.goto('login')}
+      onCreateAccountClick={() => this.goto('register')}/>, 
+      );
   }, //welcome
+//---------------------------------------------------------------
+  signIn(){
+    this.render(<SignIn
+      onSignInClick={(username, password) => this.logIn(username, password)}
+      onCancelClick={() => this.goto('welcome')}/>
+        );
+  },
 
-
-
-  login() {
-
+   logIn(username, password) {
+    console.log(username, password);
   }, //login
+//---------------------------------------------------------------
+  createAccount() {
+    this.render(<CreateAccount
+      onSubmitClick={(first, last, email, user, password) => this.newUser(first, last, email, user, password)}
+      onCancelClick={() => this.goto('welcome')}/>
+      );
+  }, //createAccount
 
-  register() {
+  newUser(first, last, email, user, password){
+    console.log(first, last, email, user, password);
+    let request = $.ajax({
+      url: "https://morning-temple-4972.herokuapp.com/signup",
+      method: 'POST',
+      data: {
+        firstname: first,
+        lastname: last,
+        email: email,
+        username: user,
+        password: password
+      } //data
+    }); //ajax
 
-  }, //register
+    $('.app').html('loading....');
+
+    request.then((data) => {
+      $.ajaxSetup({
+        headers: {
+          auth_token: data.access_token,
+          firsname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          username: data.username
+        }//headers
+      });//ajaxSetup
+      this.goto('login');
+    }).fail(() => {
+      $('.app').html('Try again......');
+
+    }); //.fail chained from .then
+
+  },//createAccount
+//---------------------------------------------------------------
 
 
 
 
 
 
-});
 
 
+
+}); //router
 export default Router;
