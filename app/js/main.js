@@ -131,23 +131,53 @@ var Router = _backbone2['default'].Router.extend({
   },
 
   logIn: function logIn(username, password) {
+    var _this3 = this;
+
     console.log(username, password);
+
+    var request = _jquery2['default'].ajax({
+      url: 'https://morning-temple-4972.herokuapp.com/login',
+      method: 'POST',
+      data: {
+        username: username,
+        password: password
+      } //data
+    }); //request
+
+    (0, _jquery2['default'])('.app').html('loading.......');
+
+    request.then(function (data) {
+      _cookiesJs2['default'].set('user', data, { expires: 7 });
+
+      _jquery2['default'].ajaxSetup({
+        headers: {
+          auth_token: data.access_token,
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          username: data.username
+        } //headers
+      }); //.ajaxSetup
+      _this3.goto('user/' + data.username);
+    }).fail(function () {
+      (0, _jquery2['default'])('.app').html('Try again......');
+    }); //.then.fail
   }, //login
   //---------------------------------------------------------------
   createAccount: function createAccount() {
-    var _this3 = this;
+    var _this4 = this;
 
     this.render(_react2['default'].createElement(_viewsCreate_account2['default'], {
       onSubmitClick: function (first, last, email, user, password) {
-        return _this3.newUser(first, last, email, user, password);
+        return _this4.newUser(first, last, email, user, password);
       },
       onCancelClick: function () {
-        return _this3.goto('welcome');
+        return _this4.goto('welcome');
       } }));
   }, //createAccount
 
   newUser: function newUser(first, last, email, user, password) {
-    var _this4 = this;
+    var _this5 = this;
 
     console.log(first, last, email, user, password);
     var request = _jquery2['default'].ajax({
@@ -168,13 +198,13 @@ var Router = _backbone2['default'].Router.extend({
       _jquery2['default'].ajaxSetup({
         headers: {
           auth_token: data.access_token,
-          firsname: data.firstname,
+          firstname: data.firstname,
           lastname: data.lastname,
           email: data.email,
           username: data.username
         } //headers
       }); //ajaxSetup
-      _this4.goto('login');
+      _this5.goto('login');
     }).fail(function () {
       (0, _jquery2['default'])('.app').html('Try again......');
     }); //.fail chained from .then

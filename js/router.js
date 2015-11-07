@@ -10,16 +10,18 @@ import $ from 'jquery';
 import NoCookies from './views/no_cookies';
 import SignIn from './views/sign_in';
 import CreateAccount from './views/create_account';
+import selectDeck from './views/select_deck';
 
 //Router for page views
 //-----------------------------------
 let Router = Backbone.Router.extend({
 
   routes: {
-    ""           : "redirectToWelecome",
-    "welcome"    : "welcome",
-    "login"      : "signIn",
-    "register"   : "createAccount",
+    ""                       : "redirectToWelecome",
+    "welcome"                : "welcome",
+    "login"                  : "signIn",
+    "register"               : "createAccount",
+    "user/:username"         : "selectDeck",
   },
 
 
@@ -75,6 +77,34 @@ let Router = Backbone.Router.extend({
 
    logIn(username, password) {
     console.log(username, password);
+
+    let request = $.ajax({
+      url: 'https://morning-temple-4972.herokuapp.com/login',
+      method: 'POST',
+      data: {
+        username: username,
+        password: password
+      }//data
+    });//request
+
+    $('.app').html('loading.......');
+
+    request.then((data) => {
+      Cookies.set('user', data, { expires: 7 });
+
+      $.ajaxSetup({
+        headers: {
+          auth_token: data.access_token,
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          username: data.username
+        }//headers
+      });//.ajaxSetup
+      this.goto(`user/${data.username}`);
+    }).fail(() => {
+      $('.app').html('Try again......');
+    }); //.then.fail
   }, //login
 //---------------------------------------------------------------
   createAccount() {
@@ -104,7 +134,7 @@ let Router = Backbone.Router.extend({
       $.ajaxSetup({
         headers: {
           auth_token: data.access_token,
-          firsname: data.firstname,
+          firstname: data.firstname,
           lastname: data.lastname,
           email: data.email,
           username: data.username
