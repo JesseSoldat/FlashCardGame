@@ -10,7 +10,11 @@ import $ from 'jquery';
 import NoCookies from './views/no_cookies';
 import SignIn from './views/sign_in';
 import CreateAccount from './views/create_account';
+//---------------------------------
 import SelectDeck from './views/select_deck';
+import PlayDeck from './views/play_deck';
+import AddDeck from './views/add_deck';
+import EditDeck from './views/edit_deck';
 
 //Router for page views
 //-----------------------------------
@@ -23,8 +27,8 @@ let Router = Backbone.Router.extend({
     "register"                        : "createAccount",
     "user/:username"                  : "selectDeck",
     "user/:username/decks"            : "addDeck",
-    "user/:username/decks/:id/edit"   : "editDeck",
     "user/:username/play/:id"         : "playDeck",
+    "user/:username/decks/:id/edit"   : "editDeck",
 
   },
 
@@ -105,9 +109,11 @@ let Router = Backbone.Router.extend({
           username: data.username
         }//headers
       });//ajaxSetup
-      this.goto('login');
+      
     }).fail(() => {
       $('.app').html('Try again......');
+      this.goto("login");
+
 
     }); //.fail chained from .then
 
@@ -150,11 +156,13 @@ let Router = Backbone.Router.extend({
       });//.ajaxSetup
       this.goto(`user/${data.username}`);
     }).fail(() => {
-      $('.app').html('Try again......');
+      this.goto('welcome')
+      $('.app').html('Try again.........');
+
     }); //.then.fail
   }, //login
 //---------------------------------------------------------------
-  removeCookie(event) {
+  removeCookies(event) {
     Cookies.remove('user');
 
     let ajaxNull = $.ajaxSetup({
@@ -188,7 +196,8 @@ let Router = Backbone.Router.extend({
       decks={data}
       onAdd={() => this.goto(`user/${userData.username}/decks`)}
       onPlay={(id) => this.goto(`user/${userData.username}/play/${id}`)}
-      onEdit={(id) => this.goto(`user/${userData.username}/decks/${id}/edit`)}/>
+      onEdit={(id) => this.goto(`user/${userData.username}/decks/${id}/edit`)}
+      onLogOut={() => this.removeCookies()}/>
       
       );
     //-----------------------
@@ -202,16 +211,52 @@ let Router = Backbone.Router.extend({
   }, //selectDeck
 //------------------------------------------------------------
   addDeck(){
-    console.log('addDeckPage');
+    let data = Cookies.getJSON('user');
+    // console.log('addDeckPage');
+    this.render(<AddDeck
+      onLogOut={() => this.removeCookies()}
+      onSubmitClick={(title) => this.newDeck(title)}
+      onCancelClick={() => this.goto(`user/${data.username}`)}/>
+      );
+  },
+  newDeck(title) {
+    console.log(title);
+    let user = Cookies.getJSON('user');
+
+    let request = $.ajax({
+      url: 'https://morning-temple-4972.herokuapp.com/decks',
+      method: 'POST',
+      headers: {
+        auth_token: user.auth_token
+      },//headers
+      data: {
+        title: title
+      }
+    });//ajax
+    $('.app').html('loading.....');
+    request.then((data) => {
+      $.ajaxSetup({
+        headers: {
+          id: data.id,
+          title: data.title
+        }
+      });
+      this.goto(`user/${user.username}`);
+    }).fail(() => {
+      $('.app').html('Could not add deck.....');
+    })
+  },//newDeck
+//------------------------------------------------------------
+   playDeck(username, id) {
+    // console.log(id);
+    <playDeck/>
   },
 //------------------------------------------------------------ 
   editDeck(username, id) {
-    console.log(id);
+    // console.log(id);
+    <EditDeck/>
   },
 //------------------------------------------------------------
-  playDeck(username, id) {
-    console.log(id);
-  },
 
 
 

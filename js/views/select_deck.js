@@ -4,8 +4,9 @@ import AdminComponent from './admin_component';
 
 export default React.createClass({
 
-  logOut(){
+  logOutHandler(){
     // console.log('logOut');
+    this.props.onLogOut();
   },
 
   addDeck(){
@@ -48,7 +49,7 @@ export default React.createClass({
     return (
     <div> 
       <div className="admin">
-       <AdminComponent onLogOut={this.logOut}/>
+       <AdminComponent logOutHandler={this.logOutHandler}/>
       </div>
 
       <div className="deckList">

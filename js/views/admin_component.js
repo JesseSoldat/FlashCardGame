@@ -3,7 +3,7 @@ import React from 'react';
 export default React.createClass({
 
   adminLogOut(){
-    this.props.onLogOut();
+    this.props.logOutHandler();
   },
 
   render() {
