@@ -1,5 +1,7 @@
-import $ from 'jquery';
-import _ from 'underscore';
-import moment from 'moment';
+import Router from './router';
 
-console.log('Hello, World');
+
+let element = document.querySelector('.app');
+
+new Router(element).start();
+
