@@ -252,7 +252,7 @@ let Router = Backbone.Router.extend({
     let user = Cookies.getJSON('user');
 
     let request=$.ajax({
-      url: `https:/morning-temple-4972.herokuapp.com/decks/${id}`,
+      url: `https:/morning-temple-4972.herokuapp.com/decks/${id}/cards`,
       method: 'GET',
       headers: {
         auth_token: user.auth_token,
@@ -265,11 +265,13 @@ let Router = Backbone.Router.extend({
 
     request.then((data) => {
 
-      console.log(data);
+      // console.log(data);
 
 
     this.render(<PlayDeck
-      cards={data}/>
+      cards={data}
+      question={data.question}
+      answer={data.answer}/>
       );
 
    })//.then
@@ -277,13 +279,37 @@ let Router = Backbone.Router.extend({
 //------------------------------------------------------------ 
   editDeck(username, id) {
     let user = Cookies.getJSON('user');
-    console.log(id);
+    // console.log(id);
+
+    let request = $.ajax({
+      url: `https:/morning-temple-4972.herokuapp.com/decks/${id}/cards`,
+      method: 'GET',
+      headers: {
+        auth_token: user.auth_token
+      },//headers
+      data: {
+        
+      },//data
+    });//ajax
+
+    $('.app').html('loading.....');
+
+    request.then((data) => {
+      console.dir(data);
+    
     this.render(<EditDeck
       deckId={id}
+      cards={data}
       onLogOut={() => this.removeCookies()}
       onCancelClick={() => this.goto(`user/${user.username}`)}
       onSubmitClick={(question, answer, id) => this.saveCard(question, answer, id)} />
       );
+      
+    }).fail(() => {
+      $('.app').html('Can not load cards......');
+    });
+
+   
   },
   saveCard(question, answer, id){
     let user = Cookies.getJSON('user');
@@ -299,7 +325,10 @@ let Router = Backbone.Router.extend({
         answer: answer
       }
     });//ajax
+    
+
     $('.app').html('loading.....');
+
     request.then((data) => {
       $.ajaxSetup({
         headers: {
@@ -308,7 +337,7 @@ let Router = Backbone.Router.extend({
           answer: data.answer
         }//headers
       });//ajaxSetup
-      this.goto(`user/${user.username}`);
+     this.goto(`user/${user.username}`);
     }).fail(() => {
       $('.app').html('Can not save card......');
     });

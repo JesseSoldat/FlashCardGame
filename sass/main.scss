@@ -8,10 +8,25 @@
 body {
   background: #e2ebf3;
 }
+ul, li {
+  padding: 0;
+  margin: 0;
+}
+li {
+  list-style: none;
+}
 .deck {
   width: 200px;
   height: 200px;
   background-color: pink;
   float: left;
   margin: 3%;
+}
+
+.cardEdit {
+  height: 100px;
+  width: 100px;
+  background-color: pink;
+  margin: 4%;
+  float: left;
 }

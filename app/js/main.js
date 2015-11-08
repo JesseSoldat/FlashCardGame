@@ -341,7 +341,7 @@ var Router = _backbone2['default'].Router.extend({
     var user = _jsCookie2['default'].getJSON('user');
 
     var request = _jquery2['default'].ajax({
-      url: 'https:/morning-temple-4972.herokuapp.com/decks/' + id,
+      url: 'https:/morning-temple-4972.herokuapp.com/decks/' + id + '/cards',
       method: 'GET',
       headers: {
         auth_token: user.auth_token
@@ -354,10 +354,12 @@ var Router = _backbone2['default'].Router.extend({
 
     request.then(function (data) {
 
-      console.log(data);
+      // console.log(data);
 
       _this9.render(_react2['default'].createElement(_viewsPlay_deck2['default'], {
-        cards: data }));
+        cards: data,
+        question: data.question,
+        answer: data.answer }));
     }); //.then
   }, //playDeck
   //------------------------------------------------------------
@@ -365,18 +367,37 @@ var Router = _backbone2['default'].Router.extend({
     var _this10 = this;
 
     var user = _jsCookie2['default'].getJSON('user');
-    console.log(id);
-    this.render(_react2['default'].createElement(_viewsEdit_deck2['default'], {
-      deckId: id,
-      onLogOut: function () {
-        return _this10.removeCookies();
-      },
-      onCancelClick: function () {
-        return _this10.goto('user/' + user.username);
-      },
-      onSubmitClick: function (question, answer, id) {
-        return _this10.saveCard(question, answer, id);
-      } }));
+    // console.log(id);
+
+    var request = _jquery2['default'].ajax({
+      url: 'https:/morning-temple-4972.herokuapp.com/decks/' + id + '/cards',
+      method: 'GET',
+      headers: {
+        auth_token: user.auth_token
+      }, //headers
+      data: {} }); //ajax
+
+    //data
+    (0, _jquery2['default'])('.app').html('loading.....');
+
+    request.then(function (data) {
+      console.dir(data);
+
+      _this10.render(_react2['default'].createElement(_viewsEdit_deck2['default'], {
+        deckId: id,
+        cards: data,
+        onLogOut: function () {
+          return _this10.removeCookies();
+        },
+        onCancelClick: function () {
+          return _this10.goto('user/' + user.username);
+        },
+        onSubmitClick: function (question, answer, id) {
+          return _this10.saveCard(question, answer, id);
+        } }));
+    }).fail(function () {
+      (0, _jquery2['default'])('.app').html('Can not load cards......');
+    });
   },
   saveCard: function saveCard(question, answer, id) {
     var _this11 = this;
@@ -394,7 +415,9 @@ var Router = _backbone2['default'].Router.extend({
         answer: answer
       }
     }); //ajax
+
     (0, _jquery2['default'])('.app').html('loading.....');
+
     request.then(function (data) {
       _jquery2['default'].ajaxSetup({
         headers: {
@@ -718,6 +741,23 @@ exports['default'] = _react2['default'].createClass({
     this.props.onSubmitClick(this.state.card_question, this.state.card_answer, this.props.deckId);
   },
 
+  showQuesAnsw: function showQuesAnsw(card) {
+    return _react2['default'].createElement(
+      'div',
+      { key: card.id, className: 'cardEdit' },
+      _react2['default'].createElement(
+        'li',
+        null,
+        card.question
+      ),
+      _react2['default'].createElement(
+        'li',
+        null,
+        card.answer
+      )
+    );
+  },
+
   render: function render() {
     return _react2['default'].createElement(
       'div',
@@ -726,7 +766,7 @@ exports['default'] = _react2['default'].createClass({
       _react2['default'].createElement(
         'h2',
         null,
-        'Edit Cards'
+        'Edit Cards.......'
       ),
       _react2['default'].createElement(
         'h3',
@@ -744,6 +784,11 @@ exports['default'] = _react2['default'].createClass({
         'button',
         { onClick: this.cancel },
         'Cancel'
+      ),
+      _react2['default'].createElement(
+        'div',
+        null,
+        this.props.cards.map(this.showQuesAnsw)
       )
     );
   }
@@ -832,6 +877,24 @@ var _react2 = _interopRequireDefault(_react);
 exports['default'] = _react2['default'].createClass({
   displayName: 'play_deck',
 
+  showQuestions: function showQuestions(card) {
+    return _react2['default'].createElement(
+      'div',
+      { key: card.id },
+      _react2['default'].createElement(
+        'li',
+        null,
+        'Question........  ',
+        card.question
+      ),
+      _react2['default'].createElement(
+        'li',
+        null,
+        'Answer.........  ',
+        card.answer
+      )
+    );
+  },
   render: function render() {
     return _react2['default'].createElement(
       'div',
@@ -842,14 +905,9 @@ exports['default'] = _react2['default'].createClass({
         'Play this deck'
       ),
       _react2['default'].createElement(
-        'h1',
+        'ul',
         null,
-        this.props.cards.title
-      ),
-      _react2['default'].createElement(
-        'h1',
-        null,
-        this.props.cards.id
+        this.props.cards.map(this.showQuestions)
       )
     );
   }

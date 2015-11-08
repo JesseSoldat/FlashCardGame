@@ -32,16 +32,25 @@ submit(){
   
 },
 
+showQuesAnsw(card){
+  return(
+    <div key={card.id} className="cardEdit">
+      <li>{card.question}</li>
+      <li>{card.answer}</li>
+    </div>  )
+},
+
   render() {
     return (
     <div>
       <AdminComponent logOutHandler={this.logOutHandler}/>
-      <h2>Edit Cards</h2>
+      <h2>Edit Cards.......</h2>
       <h3>{this.props.deckId}</h3>
       <input onChange={this.updateQuestion}></input>
       <input onChange={this.updateAnswer}></input>
       <button onClick={this.submit}>Submit</button>
       <button onClick={this.cancel}>Cancel</button>
+      <div>{this.props.cards.map(this.showQuesAnsw)}</div>
 
     </div>
     );
