@@ -1,6 +1,8 @@
 ## Welcome to My Project
 
-> I am your Readme.md file, you should probably update me.
+Based on the FE-Admin group project and tried to replicate some of it for extra practice. Sign In using username: brucelee password: brucelee.
+
+https://smashcard-practice.surge.sh/#welcome
 
 
 ## Usage
